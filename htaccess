@@ -1,0 +1,39 @@
+# Castle of Life website + app (React single-page app) on Apache / cPanel hosting.
+# Sends every page address (/about, /events/123, /app/members ...) to index.html,
+# so refreshing or opening a link directly never gives a 404.
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Force HTTPS (remove these two lines if your host has no SSL certificate yet)
+  RewriteCond %{HTTPS} !=on
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # Leave real files and folders alone (JS, CSS, images, favicon...)
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # If the API is served from the same domain under /api, don't touch it
+  RewriteRule ^api/ - [L]
+
+  # Everything else is a page of the app
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# index.html must never be cached, so visitors always get the latest version after an update
+<IfModule mod_headers.c>
+  <FilesMatch "^index\.html$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+  </FilesMatch>
+  # built files have a unique name per version, so they can be cached for a year
+  <FilesMatch "\.(js|css|woff2?|svg|png|jpe?g|webp|gif|ico)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
+
+# Compress text files for faster loading
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>
