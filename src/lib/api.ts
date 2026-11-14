@@ -1,5 +1,5 @@
 /** Small fetch wrapper: JSON in/out, bearer token, typed errors. */
-const BASE = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') || '/api/v1'
+const BASE = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') || 'https://church-backend-fv0c.onrender.com/api/v1'
 const TOKEN_KEY = 'church.token'
 
 export const tokenStore = {
